@@ -2,17 +2,15 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>org.spigotmc</groupId>
-        <artifactId>spigot-parent</artifactId>
+        <groupId>com.github.protospigot</groupId>
+        <artifactId>protospigot</artifactId>
         <version>dev-SNAPSHOT</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
 
-    <groupId>org.spigotmc</groupId>
-    <artifactId>spigot-api</artifactId>
+    <artifactId>protospigot-api</artifactId>
     <version>1.5.2-R1.1-SNAPSHOT</version>
-    <name>Spigot-API</name>
-    <url>http://www.spigotmc.org</url>
+    <name>ProtoSpigot-API</name>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -838,7 +838,7 @@ public abstract class MinecraftServer implements ICommandListener, Runnable, IMo
     }
 
     public String getServerModName() {
-        return "craftbukkit"; // CraftBukkit - cb > vanilla!
+        return "ProtoSpigot"; // CraftBukkit - cb > vanilla! // ProtoSpigot
     }
 
     public CrashReport b(CrashReport crashreport) {
