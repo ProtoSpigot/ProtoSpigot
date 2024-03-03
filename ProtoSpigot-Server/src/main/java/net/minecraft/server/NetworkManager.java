@@ -196,8 +196,15 @@ public class NetworkManager implements INetworkManager {
         boolean flag = false;
 
         try {
-            Packet packet = ProtoSpigot.readPacket(this.input, this.protocolVersion, this.modern); // ProtoSpigot - multiple protocol support
+            Packet packet = ProtoSpigot.readPacket(this, this.input); // ProtoSpigot - multiple protocol support
             if (packet != null) {
+                // ProtoSpigot start - handle handshake settings early
+                if (packet instanceof Packet2Handshake) {
+                    Packet2Handshake handshake = (Packet2Handshake) packet;
+                    this.initializeSettings(handshake.getProtocolVersion(), handshake.isModern());
+                }
+                // ProtoSpigot end
+
                 if (packet instanceof Packet252KeyResponse && !this.f) {
                     if (this.connection.a()) {
                         this.A = ((Packet252KeyResponse) packet).a(this.B);

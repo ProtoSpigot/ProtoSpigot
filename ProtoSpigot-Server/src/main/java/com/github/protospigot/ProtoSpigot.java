@@ -6,7 +6,9 @@ import com.github.protospigot.protocol.Protocol;
 import com.github.protospigot.protocol.handshake.HandshakeHandlers;
 import com.github.protospigot.protocol.protocol_1_5_2.Protocol_1_5_2;
 import com.github.protospigot.util.ReadUtil;
+import net.minecraft.server.INetworkManager;
 import net.minecraft.server.Packet;
+import net.minecraft.server.Packet2Handshake;
 
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -77,10 +79,20 @@ public final class ProtoSpigot {
         writer.write(packet, stream);
     }
 
-    public static Packet readPacket(DataInputStream stream, int protocolVersion, boolean modern) throws IOException {
+    /**
+     * Reads a packet with from a stream with a network manager.
+     *
+     * @param manager the network manager
+     * @param stream the stream
+     * @return the packet
+     */
+    public static Packet readPacket(INetworkManager manager, DataInputStream stream) throws IOException {
+        int protocolVersion = manager.getProtocolVersion();
+        boolean modern = manager.isModern();
+
         // Handshaking
         if (protocolVersion == -1) {
-            PacketReader<?> handshakePacketReader;
+            PacketReader<Packet2Handshake> handshakePacketReader;
             int packetId = stream.readUnsignedByte();
 
             // Valid handshake packet id, legacy
@@ -97,7 +109,10 @@ public final class ProtoSpigot {
                 handshakePacketReader = HandshakeHandlers.MODERN;
             }
 
-            return handshakePacketReader.read(stream);
+            // Handle a handshake packet early to fix the login packet on modern protocols
+            Packet2Handshake handshakePacket = handshakePacketReader.read(stream);
+            manager.initializeSettings(handshakePacket.getProtocolVersion(), handshakePacket.isModern());
+            return handshakePacket;
         }
 
         // Other packets

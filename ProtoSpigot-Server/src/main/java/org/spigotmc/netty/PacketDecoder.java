@@ -55,7 +55,7 @@ public class PacketDecoder extends ReplayingDecoder<ReadState>
                     {
                         // ProtoSpigot start - multiple protocol support
                         NettyNetworkManager manager = ctx.channel().pipeline().get(NettyNetworkManager.class);
-                        Packet packet = ProtoSpigot.readPacket(this.input, manager.getProtocolVersion(), manager.isModern());
+                        Packet packet = ProtoSpigot.readPacket(manager, this.input);
                         if (packet != null)
                             out.add(packet);
                         // ProtoSpigot end

@@ -70,11 +70,6 @@ public class PendingConnection extends Connection {
     }
 
     public void a(Packet2Handshake packet2handshake) {
-        // ProtoSpigot start - multiple protocol support
-        int protocolVersion = packet2handshake.getProtocolVersion();
-        this.networkManager.initializeSettings(protocolVersion, packet2handshake.isModern());
-        // ProtoSpigot end
-
         // CraftBukkit start
         this.hostname = packet2handshake.c == null ? "" : packet2handshake.c + ':' + packet2handshake.d;
         // CraftBukkit end
@@ -85,6 +80,7 @@ public class PendingConnection extends Connection {
             PublicKey publickey = this.server.F().getPublic();
 
             // ProtoSpigot start - multiple protocol support
+            int protocolVersion = packet2handshake.getProtocolVersion();
             if (!ProtoSpigot.supports(protocolVersion)) {
                 this.disconnect("Unsupported client version!");
                 return;
