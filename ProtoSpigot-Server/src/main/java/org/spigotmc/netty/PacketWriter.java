@@ -64,7 +64,7 @@ public class PacketWriter
                 // ProtoSpigot start - multiple protocol support
                 // Write packet ID and data
                 try {
-                    ProtoSpigot.writePacket(packet, dataOut, networkManager.getProtocolVersion());
+                    ProtoSpigot.writePacket(packet, dataOut, networkManager);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }

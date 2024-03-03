@@ -1,6 +1,7 @@
 package com.github.protospigot.protocol.protocol_1_5_2;
 
 import com.github.protospigot.protocol.Protocol;
+import com.github.protospigot.protocol.ProtocolType;
 import com.github.protospigot.protocol.protocol_1_5_2.clientbound.ChatPacketWriter;
 import com.github.protospigot.protocol.protocol_1_5_2.clientbound.EntityEquipmentPacketWriter;
 import com.github.protospigot.protocol.protocol_1_5_2.clientbound.KeepAlivePacketWriter;
@@ -22,7 +23,7 @@ public final class Protocol_1_5_2 extends Protocol {
     private static final int MAX_STRING_LENGTH = 32767;
 
     public Protocol_1_5_2() {
-        super(61);
+        super(61, ProtocolType.LEGACY);
 
         registerClientPacket(0, Packet0KeepAlive.class, new KeepAlivePacketWriter());
         registerClientPacket(1, Packet1Login.class, new LoginPacketWriter());

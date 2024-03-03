@@ -1,6 +1,7 @@
 package com.github.protospigot.protocol.handshake;
 
 import com.github.protospigot.handler.PacketReader;
+import com.github.protospigot.protocol.ProtocolType;
 import net.minecraft.server.Packet;
 import net.minecraft.server.Packet2Handshake;
 
@@ -21,6 +22,6 @@ final class LegacyHandshakeHandler implements PacketReader<Packet2Handshake> {
         if (!Packet2Handshake.validName.matcher(username).matches())
             throw new IOException("Invalid name!");
 
-        return new Packet2Handshake(protocolVersion, username, serverAddress, serverPort, false);
+        return new Packet2Handshake(protocolVersion, username, serverAddress, serverPort, ProtocolType.LEGACY);
     }
 }

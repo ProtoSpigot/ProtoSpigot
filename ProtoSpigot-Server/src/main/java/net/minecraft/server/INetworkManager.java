@@ -1,5 +1,7 @@
 package net.minecraft.server;
 
+import com.github.protospigot.protocol.ProtocolType; // ProtoSpigot
+
 import java.net.SocketAddress;
 
 public interface INetworkManager {
@@ -33,19 +35,19 @@ public interface INetworkManager {
     int getProtocolVersion();
 
     /**
-     * Checks if the client's version is 1.7 or newer.
+     * Gets a protocol type of the network manager.
      *
-     * @return true if the client's version is 1.7 or newer, false otherwise
+     * @return the protocol type
      */
-    boolean isModern();
+    ProtocolType getProtocolType();
 
     /**
-     * Initializes a protocol version and "modern" setting of the network manager.
+     * Initializes a protocol version and protocol type of the network manager.
      * Should be only called while receiving a handshake packet.
      *
      * @param protocolVersion the protocol version
-     * @param modern the "modern" setting
+     * @param protocolType the protocol type
      */
-    void initializeSettings(int protocolVersion, boolean modern);
+    void initializeSettings(int protocolVersion, ProtocolType protocolType);
     // ProtoSpigot end
 }

@@ -1,6 +1,7 @@
 package net.minecraft.server;
 
 import com.github.protospigot.ProtoSpigot;
+import com.github.protospigot.protocol.ProtocolType;
 
 import java.io.Serializable;
 import java.net.InetAddress;
@@ -81,7 +82,8 @@ public class PendingConnection extends Connection {
 
             // ProtoSpigot start - multiple protocol support
             int protocolVersion = packet2handshake.getProtocolVersion();
-            if (!ProtoSpigot.supports(protocolVersion)) {
+            ProtocolType protocolType = packet2handshake.getProtocolType();
+            if (!ProtoSpigot.supports(protocolVersion, protocolType)) {
                 this.disconnect("Unsupported client version!");
                 return;
             }

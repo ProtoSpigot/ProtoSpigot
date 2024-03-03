@@ -1,5 +1,7 @@
 package net.minecraft.server;
 
+import com.github.protospigot.protocol.ProtocolType; // ProtoSpigot
+
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 
@@ -12,19 +14,19 @@ public class Packet2Handshake extends Packet {
     public String c; // CraftBukkit private -> public
     public int d; // CraftBukkit private -> public
 
-    private final boolean modern; // ProtoSpigot - 1.7+
+    private final ProtocolType protocolType; // ProtoSpigot - 1.7+
 
     public Packet2Handshake() {
-        this.modern = false; // ProtoSpigot - 1.7+
+        this.protocolType = ProtocolType.LEGACY; // ProtoSpigot - 1.7+
     }
 
     // ProtoSpigot start
-    public Packet2Handshake(int protocolVersion, String username, String serverHost, int serverPort, boolean modern) {
+    public Packet2Handshake(int protocolVersion, String username, String serverHost, int serverPort, ProtocolType protocolType) {
         this.a = protocolVersion;
         this.b = username;
         this.c = serverHost;
         this.d = serverPort;
-        this.modern = modern;
+        this.protocolType = protocolType;
     }
     // ProtoSpigot end
 
@@ -67,8 +69,8 @@ public class Packet2Handshake extends Packet {
     // ProtoSpigot end
 
     // ProtoSpigot start - 1.7+
-    public boolean isModern() {
-        return this.modern;
+    public ProtocolType getProtocolType() {
+        return this.protocolType;
     }
     // ProtoSpigot end
 }

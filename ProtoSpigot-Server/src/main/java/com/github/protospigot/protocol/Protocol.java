@@ -10,6 +10,7 @@ import java.util.Map;
 public class Protocol {
 
     private final int protocolVersion;
+    private final ProtocolType protocolType;
 
     private final Map<Class<? extends Packet>, PacketWriter<? extends Packet>> writers = new HashMap<>();
     private final Map<Class<? extends Packet>, Integer> clientBoundPackets = new HashMap<>();
@@ -17,8 +18,9 @@ public class Protocol {
     private final Map<Class<? extends Packet>, PacketReader<? extends Packet>> readers = new HashMap<>();
     private final Map<Integer, Class<? extends Packet>> serverBoundPackets = new HashMap<>();
 
-    public Protocol(int protocolVersion) {
+    public Protocol(int protocolVersion, ProtocolType protocolType) {
         this.protocolVersion = protocolVersion;
+        this.protocolType = protocolType;
     }
 
     /**
@@ -70,6 +72,15 @@ public class Protocol {
      */
     public int getProtocolVersion() {
         return this.protocolVersion;
+    }
+
+    /**
+     * Gets a protocol type of the protocol.
+     *
+     * @return the protocol type
+     */
+    public ProtocolType getProtocolType() {
+        return this.protocolType;
     }
 
     /**

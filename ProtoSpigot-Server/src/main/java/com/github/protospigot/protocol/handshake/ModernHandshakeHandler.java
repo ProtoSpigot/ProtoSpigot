@@ -1,6 +1,7 @@
 package com.github.protospigot.protocol.handshake;
 
 import com.github.protospigot.handler.PacketReader;
+import com.github.protospigot.protocol.ProtocolType;
 import com.github.protospigot.util.ReadUtil;
 import net.minecraft.server.Packet2Handshake;
 
@@ -19,6 +20,6 @@ final class ModernHandshakeHandler implements PacketReader<Packet2Handshake> {
 
         ReadUtil.readVarInt(stream); // Read next protocol state, unused (yet)
 
-        return new Packet2Handshake(protocolVersion, "", serverAddress, serverPort, true);
+        return new Packet2Handshake(protocolVersion, "", serverAddress, serverPort, ProtocolType.MODERN);
     }
 }

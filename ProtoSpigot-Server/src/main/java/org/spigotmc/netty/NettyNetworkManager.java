@@ -1,5 +1,6 @@
 package org.spigotmc.netty;
 
+import com.github.protospigot.protocol.ProtocolType; // ProtoSpigot
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -73,7 +74,7 @@ public class NettyNetworkManager extends ChannelInboundHandlerAdapter implements
 
     // ProtoSpigot start - multiple protocol support
     private int protocolVersion = -1;
-    private boolean modern;
+    private ProtocolType protocolType;
     // ProtoSpigot end
 
     @Override
@@ -273,16 +274,16 @@ public class NettyNetworkManager extends ChannelInboundHandlerAdapter implements
     }
 
     @Override
-    public boolean isModern() {
-        return this.modern;
+    public ProtocolType getProtocolType() {
+        return this.protocolType;
     }
 
     @Override
-    public void initializeSettings(int protocolVersion, boolean modern) {
+    public void initializeSettings(int protocolVersion, ProtocolType protocolType) {
         if (this.protocolVersion != -1)
             throw new UnsupportedOperationException("Protocol version has been already set");
         this.protocolVersion = protocolVersion;
-        this.modern = modern;
+        this.protocolType = protocolType;
     }
     // ProtoSpigot end
 
