@@ -92,7 +92,7 @@ public final class ProtoSpigot {
                 packetId = ReadUtil.readVarInt(stream); // Packet ID
 
                 // Make sure that the modern packet id is 0 (handshaking)
-                if (packetId == 0) return null;
+                if (packetId != 0) return null;
 
                 handshakePacketReader = HandshakeHandlers.MODERN;
             }
