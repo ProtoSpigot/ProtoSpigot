@@ -8,8 +8,6 @@ import io.netty.channel.MessageList;
 import io.netty.handler.codec.ReplayingDecoder;
 import java.io.DataInputStream;
 import java.io.EOFException;
-import java.io.IOException;
-import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.Packet;
 
 /**
@@ -21,11 +19,10 @@ public class PacketDecoder extends ReplayingDecoder<ReadState>
 {
 
     private DataInputStream input;
-    private Packet packet;
 
     public PacketDecoder()
     {
-        super( ReadState.DATA ); // ProtoSpigot
+        super(ReadState.DATA); // ProtoSpigot
     }
 
     @Override
@@ -36,39 +33,17 @@ public class PacketDecoder extends ReplayingDecoder<ReadState>
             input = new DataInputStream( new ByteBufInputStream( in ) );
         }
 
-        while ( true )
-        {
-            switch ( state() )
-            {
-                case HEADER:
-                    /*short packetId = in.readUnsignedByte();
-                    // ProtoSpigot start - multiple protocol support
-                    NettyNetworkManager manager = ctx.channel().pipeline().get(NettyNetworkManager.class);
-                    packetReader = ProtoSpigot.getPacketReader(packetId, manager.getProtocolVersion());
-                    if ( packetReader == null ) {
-                        throw new IOException("Bad packet id " + packetId);
-                    }
-                    // ProtoSpigot end
-                    checkpoint( ReadState.DATA );*/
-                case DATA:
-                    try
-                    {
-                        // ProtoSpigot start - multiple protocol support
-                        NettyNetworkManager manager = ctx.channel().pipeline().get(NettyNetworkManager.class);
-                        Packet packet = ProtoSpigot.readPacket(manager, this.input);
-                        if (packet != null)
-                            out.add(packet);
-                        // ProtoSpigot end
-                    } catch ( EOFException ex )
-                    {
-                        return;
-                    }
-
-                    //checkpoint( ReadState.HEADER );
-                    break;
-                default:
-                    throw new IllegalStateException();
+        // ProtoSpigot start - multiple protocol support
+        while (true) {
+            try {
+                NettyNetworkManager manager = ctx.channel().pipeline().get(NettyNetworkManager.class);
+                Packet packet = ProtoSpigot.readPacket(manager, this.input);
+                if (packet != null)
+                    out.add(packet);
+            } catch ( EOFException ex ) {
+                return;
             }
         }
+        // ProtoSpigot end
     }
 }
