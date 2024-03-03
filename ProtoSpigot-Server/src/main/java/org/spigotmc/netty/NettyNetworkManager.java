@@ -71,6 +71,11 @@ public class NettyNetworkManager extends ChannelInboundHandlerAdapter implements
     private long writtenBytes;
     private PacketWriter writer;
 
+    // ProtoSpigot start - multiple protocol support
+    private int protocolVersion = -1;
+    private boolean modern;
+    // ProtoSpigot end
+
     @Override
     public void channelActive(ChannelHandlerContext ctx) throws Exception
     {
@@ -260,6 +265,26 @@ public class NettyNetworkManager extends ChannelInboundHandlerAdapter implements
     {
         this.address = address;
     }
+
+    // ProtoSpigot start - multiple protocol support
+    @Override
+    public int getProtocolVersion() {
+        return this.protocolVersion;
+    }
+
+    @Override
+    public boolean isModern() {
+        return this.modern;
+    }
+
+    @Override
+    public void initializeSettings(int protocolVersion, boolean modern) {
+        if (this.protocolVersion != -1)
+            throw new UnsupportedOperationException("Protocol version has been already set");
+        this.protocolVersion = protocolVersion;
+        this.modern = modern;
+    }
+    // ProtoSpigot end
 
     /**
      * close. Close and release all resources associated with this connection.

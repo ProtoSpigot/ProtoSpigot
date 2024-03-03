@@ -1,5 +1,7 @@
 package net.minecraft.server;
 
+import com.github.protospigot.ProtoSpigot;
+
 import java.io.Serializable;
 import java.net.InetAddress;
 import java.net.Socket;
@@ -68,6 +70,11 @@ public class PendingConnection extends Connection {
     }
 
     public void a(Packet2Handshake packet2handshake) {
+        // ProtoSpigot start - multiple protocol support
+        int protocolVersion = packet2handshake.getProtocolVersion();
+        this.networkManager.initializeSettings(protocolVersion, packet2handshake.isModern());
+        // ProtoSpigot end
+
         // CraftBukkit start
         this.hostname = packet2handshake.c == null ? "" : packet2handshake.c + ':' + packet2handshake.d;
         // CraftBukkit end
@@ -77,18 +84,17 @@ public class PendingConnection extends Connection {
         } else {
             PublicKey publickey = this.server.F().getPublic();
 
-            if (packet2handshake.d() != 61) {
-                if (packet2handshake.d() > 61) {
-                    this.disconnect("Outdated server!");
-                } else {
-                    this.disconnect("Outdated client!");
-                }
-            } else {
-                this.loginKey = this.server.getOnlineMode() ? Long.toString(random.nextLong(), 16) : "-";
-                this.d = new byte[4];
-                random.nextBytes(this.d);
-                this.networkManager.queue(new Packet253KeyRequest(this.loginKey, publickey, this.d));
+            // ProtoSpigot start - multiple protocol support
+            if (!ProtoSpigot.supports(protocolVersion)) {
+                this.disconnect("Unsupported client version!");
+                return;
             }
+            // ProtoSpigot end
+
+            this.loginKey = this.server.getOnlineMode() ? Long.toString(random.nextLong(), 16) : "-";
+            this.d = new byte[4];
+            random.nextBytes(this.d);
+            this.networkManager.queue(new Packet253KeyRequest(this.loginKey, publickey, this.d));
         }
     }
 

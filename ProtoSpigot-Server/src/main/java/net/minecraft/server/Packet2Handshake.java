@@ -12,7 +12,21 @@ public class Packet2Handshake extends Packet {
     public String c; // CraftBukkit private -> public
     public int d; // CraftBukkit private -> public
 
-    public Packet2Handshake() {}
+    private final boolean modern; // ProtoSpigot - 1.7+
+
+    public Packet2Handshake() {
+        this.modern = false; // ProtoSpigot - 1.7+
+    }
+
+    // ProtoSpigot start
+    public Packet2Handshake(int protocolVersion, String username, String serverHost, int serverPort, boolean modern) {
+        this.a = protocolVersion;
+        this.b = username;
+        this.c = serverHost;
+        this.d = serverPort;
+        this.modern = modern;
+    }
+    // ProtoSpigot end
 
     public static final java.util.regex.Pattern validName = java.util.regex.Pattern.compile("^[a-zA-Z0-9_-]{2,16}$");
     public void a(DataInputStream datainputstream) throws IOException { // CraftBukkit - throws IOException
@@ -45,4 +59,16 @@ public class Packet2Handshake extends Packet {
     public String f() {
         return this.b;
     }
+
+    // ProtoSpigot start - obfuscation helpers
+    public int getProtocolVersion() {
+        return this.a;
+    }
+    // ProtoSpigot end
+
+    // ProtoSpigot start - 1.7+
+    public boolean isModern() {
+        return this.modern;
+    }
+    // ProtoSpigot end
 }

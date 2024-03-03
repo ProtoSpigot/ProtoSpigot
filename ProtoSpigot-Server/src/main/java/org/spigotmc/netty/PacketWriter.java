@@ -1,5 +1,7 @@
 package org.spigotmc.netty;
 
+import com.github.protospigot.ProtoSpigot;
+import com.github.protospigot.protocol.Protocol;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.channel.Channel;
@@ -59,16 +61,14 @@ public class PacketWriter
             // Iterate through all packets, this is safe as we know we will only ever get packets in the pipeline
             for ( Packet packet : pending )
             {
-                // Write packet ID
-                outBuf.writeByte( packet.n() );
-                // Write packet data
-                try
-                {
-                    packet.a( dataOut );
-                } catch ( IOException ex )
-                {
-                    throw new EncoderException( ex );
+                // ProtoSpigot start - multiple protocol support
+                // Write packet ID and data
+                try {
+                    ProtoSpigot.writePacket(packet, dataOut, networkManager.getProtocolVersion());
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
+                // ProtoSpigot end
             }
             // Add to the courtesy API providing number of written bytes
             networkManager.addWrittenBytes( outBuf.readableBytes() );

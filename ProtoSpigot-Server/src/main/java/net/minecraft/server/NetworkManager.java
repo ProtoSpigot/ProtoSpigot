@@ -1,5 +1,7 @@
 package net.minecraft.server;
 
+import com.github.protospigot.ProtoSpigot;
+
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -49,6 +51,11 @@ public class NetworkManager implements INetworkManager {
     private PrivateKey B = null;
     private int lowPriorityQueueDelay = 50;
 
+    // ProtoSpigot start - multiple protocol support
+    private int protocolVersion = -1;
+    private boolean modern;
+    // ProtoSpigot end
+
     public NetworkManager(IConsoleLogManager iconsolelogmanager, Socket socket, String s, Connection connection, PrivateKey privatekey) throws IOException { // CraftBukkit - throws IOException
         this.B = privatekey;
         this.socket = socket;
@@ -97,7 +104,7 @@ public class NetworkManager implements INetworkManager {
             if (this.e == 0 || !this.highPriorityQueue.isEmpty() && System.currentTimeMillis() - ((Packet) this.highPriorityQueue.get(0)).timestamp >= (long) this.e) {
                 packet = this.a(false);
                 if (packet != null) {
-                    Packet.a(packet, this.output);
+                    ProtoSpigot.writePacket(packet, this.output, this.protocolVersion); // ProtoSpigot - multiple protocol support
                     if (packet instanceof Packet252KeyResponse && !this.g) {
                         if (!this.connection.a()) {
                             this.A = ((Packet252KeyResponse) packet).d();
@@ -117,7 +124,7 @@ public class NetworkManager implements INetworkManager {
             if ((flag || this.lowPriorityQueueDelay-- <= 0) && !this.lowPriorityQueue.isEmpty() && (this.highPriorityQueue.isEmpty() || ((Packet) this.highPriorityQueue.get(0)).timestamp > ((Packet) this.lowPriorityQueue.get(0)).timestamp)) {
                 packet = this.a(true);
                 if (packet != null) {
-                    Packet.a(packet, this.output);
+                    ProtoSpigot.writePacket(packet, this.output, this.protocolVersion); // ProtoSpigot - multiple protocol support
                     aint = d;
                     i = packet.n();
                     aint[i] += packet.a() + 1;
@@ -189,8 +196,7 @@ public class NetworkManager implements INetworkManager {
         boolean flag = false;
 
         try {
-            Packet packet = Packet.a(this.i, this.input, this.connection.a(), this.socket);
-
+            Packet packet = ProtoSpigot.readPacket(this.input, this.protocolVersion, this.modern); // ProtoSpigot - multiple protocol support
             if (packet != null) {
                 if (packet instanceof Packet252KeyResponse && !this.f) {
                     if (this.connection.a()) {
@@ -333,6 +339,26 @@ public class NetworkManager implements INetworkManager {
     public Socket getSocket() {
         return this.socket;
     }
+
+    // ProtoSpigot start - multiple protocol support
+    @Override
+    public int getProtocolVersion() {
+        return this.protocolVersion;
+    }
+
+    @Override
+    public boolean isModern() {
+        return this.modern;
+    }
+
+    @Override
+    public void initializeSettings(int protocolVersion, boolean modern) {
+        if (this.protocolVersion != -1)
+            throw new UnsupportedOperationException("Network manager settings are already initialized");
+        this.protocolVersion = protocolVersion;
+        this.modern = modern;
+    }
+    // ProtoSpigot end
 
     static boolean a(NetworkManager networkmanager) {
         return networkmanager.n;

@@ -1,5 +1,6 @@
 package org.spigotmc.netty;
 
+import com.github.protospigot.ProtoSpigot;
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufInputStream;
 import io.netty.channel.ChannelHandlerContext;
@@ -24,7 +25,7 @@ public class PacketDecoder extends ReplayingDecoder<ReadState>
 
     public PacketDecoder()
     {
-        super( ReadState.HEADER );
+        super( ReadState.DATA ); // ProtoSpigot
     }
 
     @Override
@@ -40,25 +41,30 @@ public class PacketDecoder extends ReplayingDecoder<ReadState>
             switch ( state() )
             {
                 case HEADER:
-                    short packetId = in.readUnsignedByte();
-                    packet = Packet.a( MinecraftServer.getServer().getLogger(), packetId );
-                    if ( packet == null )
-                    {
-                        throw new IOException( "Bad packet id " + packetId );
+                    /*short packetId = in.readUnsignedByte();
+                    // ProtoSpigot start - multiple protocol support
+                    NettyNetworkManager manager = ctx.channel().pipeline().get(NettyNetworkManager.class);
+                    packetReader = ProtoSpigot.getPacketReader(packetId, manager.getProtocolVersion());
+                    if ( packetReader == null ) {
+                        throw new IOException("Bad packet id " + packetId);
                     }
-                    checkpoint( ReadState.DATA );
+                    // ProtoSpigot end
+                    checkpoint( ReadState.DATA );*/
                 case DATA:
                     try
                     {
-                        packet.a( input );
+                        // ProtoSpigot start - multiple protocol support
+                        NettyNetworkManager manager = ctx.channel().pipeline().get(NettyNetworkManager.class);
+                        Packet packet = ProtoSpigot.readPacket(this.input, manager.getProtocolVersion(), manager.isModern());
+                        if (packet != null)
+                            out.add(packet);
+                        // ProtoSpigot end
                     } catch ( EOFException ex )
                     {
                         return;
                     }
 
-                    checkpoint( ReadState.HEADER );
-                    out.add( packet );
-                    packet = null;
+                    //checkpoint( ReadState.HEADER );
                     break;
                 default:
                     throw new IllegalStateException();
