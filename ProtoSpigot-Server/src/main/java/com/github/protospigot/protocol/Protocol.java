@@ -90,7 +90,7 @@ public class Protocol {
      * @param packet the packet
      * @param writer the writer
      */
-    protected <P extends Packet> void registerClientPacket(int id, Class<P> packet, PacketWriter<P> writer) {
+    protected <P extends Packet> void registerServerPacket(int id, Class<P> packet, PacketWriter<P> writer) {
         this.clientBoundPackets.put(packet, id);
         this.writers.put(packet, writer);
     }

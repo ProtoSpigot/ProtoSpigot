@@ -1,4 +1,4 @@
-package com.github.protospigot.protocol.handshake;
+package com.github.protospigot.handshake;
 
 import com.github.protospigot.handler.PacketReader;
 import com.github.protospigot.protocol.ProtocolType;

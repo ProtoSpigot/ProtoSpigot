@@ -7,8 +7,8 @@ import java.io.IOException;
 
 public final class ReadUtil {
 
-    private static final int SEGMENT_BITS = 0x7F;
-    private static final int CONTINUE_BIT = 0x80;
+    static final int SEGMENT_BITS = 0x7F;
+    static final int CONTINUE_BIT = 0x80;
 
     /**
      * Reads a 1.7+ var-int from an input stream.

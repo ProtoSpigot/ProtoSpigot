@@ -1,7 +1,9 @@
 package net.minecraft.server;
 
+// ProtoSpigot start
 import com.github.protospigot.ProtoSpigot;
-import com.github.protospigot.protocol.ProtocolType; // ProtoSpigot
+import com.github.protospigot.protocol.ProtocolType;
+// ProtoSpigot end
 
 import java.io.BufferedOutputStream;
 import java.io.DataInputStream;
@@ -53,7 +55,7 @@ public class NetworkManager implements INetworkManager {
     private int lowPriorityQueueDelay = 50;
 
     // ProtoSpigot start - multiple protocol support
-    private int protocolVersion = -1;
+    private int protocolVersion = ProtoSpigot.UNKNOWN_PROTOCOL_VERSION;
     private ProtocolType protocolType;
     // ProtoSpigot end
 

@@ -1,6 +1,9 @@
 package org.spigotmc.netty;
 
-import com.github.protospigot.protocol.ProtocolType; // ProtoSpigot
+// ProtoSpigot start
+import com.github.protospigot.ProtoSpigot;
+import com.github.protospigot.protocol.ProtocolType;
+// ProtoSpigot end
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
@@ -73,7 +76,7 @@ public class NettyNetworkManager extends ChannelInboundHandlerAdapter implements
     private PacketWriter writer;
 
     // ProtoSpigot start - multiple protocol support
-    private int protocolVersion = -1;
+    private int protocolVersion = ProtoSpigot.UNKNOWN_PROTOCOL_VERSION;
     private ProtocolType protocolType;
     // ProtoSpigot end
 

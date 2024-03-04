@@ -1,16 +1,16 @@
 package com.github.protospigot;
 
-import com.github.protospigot.handler.PacketReader;
 import com.github.protospigot.handler.PacketWriter;
 import com.github.protospigot.protocol.Protocol;
 import com.github.protospigot.protocol.ProtocolType;
-import com.github.protospigot.protocol.handshake.HandshakeHandlers;
+import com.github.protospigot.handshake.HandshakeHandler;
 import com.github.protospigot.protocol.protocol_1_5_2.Protocol_1_5_2;
 import com.github.protospigot.util.ReadUtil;
+import com.github.protospigot.util.WriteUtil;
 import net.minecraft.server.INetworkManager;
 import net.minecraft.server.Packet;
-import net.minecraft.server.Packet2Handshake;
 
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
@@ -18,7 +18,12 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
+/**
+ * A main class for manipulating minecraft protocol.
+ */
 public final class ProtoSpigot {
+
+    public static final int UNKNOWN_PROTOCOL_VERSION = -1;
 
     private static final Set<Protocol> PROTOCOLS = new HashSet<>();
     private static final Set<Protocol> UNMODIFIABLE_PROTOCOLS = Collections.unmodifiableSet(PROTOCOLS);
@@ -74,53 +79,58 @@ public final class ProtoSpigot {
      * @param <P> the type of packet
      */
     public static <P extends Packet> void writePacket(P packet, DataOutputStream stream, INetworkManager networkManager) throws IOException {
-        Protocol protocol = getProtocol(networkManager.getProtocolVersion(), networkManager.getProtocolType());
+        ProtocolType protocolType = networkManager.getProtocolType();
+
+        Protocol protocol = getProtocol(networkManager.getProtocolVersion(), protocolType);
         if (protocol == null) return;
 
         PacketWriter<P> writer = (PacketWriter<P>) protocol.getWriter(packet.getClass());
         if (writer == null) return;
 
-        stream.writeByte(protocol.getServerPacketId(packet.getClass()));
+        int packetId = protocol.getServerPacketId(packet.getClass());
+
+        // Packet header
+        switch (protocolType) {
+            case LEGACY:
+                stream.writeByte(packetId);
+                writer.write(packet, stream);
+                break;
+            case MODERN:
+                ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+                DataOutputStream dataStream = new DataOutputStream(byteStream);
+
+                // Packet ID and body
+                WriteUtil.writeVarInt(dataStream, packetId);
+                writer.write(packet, dataStream);
+                byte[] idAndBody = byteStream.toByteArray();
+
+                WriteUtil.writeVarInt(stream, idAndBody.length);
+                stream.write(idAndBody);
+                break;
+            default:
+                // Code that never can't be reached, but java compiler says something else...
+                throw new IllegalArgumentException("Unknown protocol type");
+        }
+
+        // Packet body
         writer.write(packet, stream);
     }
 
     /**
      * Reads a packet with from a stream with a network manager.
      *
-     * @param manager the network manager
+     * @param networkManager the network manager
      * @param stream the stream
      * @return the packet
      */
-    public static Packet readPacket(INetworkManager manager, DataInputStream stream) throws IOException {
-        int protocolVersion = manager.getProtocolVersion();
+    public static Packet readPacket(INetworkManager networkManager, DataInputStream stream) throws IOException {
+        int protocolVersion = networkManager.getProtocolVersion();
 
-        // Handshaking
-        if (protocolVersion == -1) {
-            PacketReader<Packet2Handshake> handshakePacketReader;
-            int packetId = stream.readUnsignedByte();
+        // Protocol version is an unknown version, we're sure that the packet must be handshaking
+        if (protocolVersion == UNKNOWN_PROTOCOL_VERSION)
+            return HandshakeHandler.handle(networkManager, stream);
 
-            // Valid handshake packet id, legacy
-            if (packetId == 2)
-                handshakePacketReader = HandshakeHandlers.LEGACY;
-            // Invalid handshake packet id, modern
-            else {
-                ReadUtil.readVarInt(packetId, stream); // Packet size
-                packetId = ReadUtil.readVarInt(stream); // Packet ID
-
-                // Make sure that the modern packet id is 0 (handshaking)
-                if (packetId != 0) return null;
-
-                handshakePacketReader = HandshakeHandlers.MODERN;
-            }
-
-            // Handle a handshake packet early to fix the login packet on modern protocols
-            Packet2Handshake handshakePacket = handshakePacketReader.read(stream);
-            manager.initializeSettings(handshakePacket.getProtocolVersion(), handshakePacket.getProtocolType());
-            return handshakePacket;
-        }
-
-        // Other packets
-        ProtocolType protocolType = manager.getProtocolType();
+        ProtocolType protocolType = networkManager.getProtocolType();
 
         int packetId;
         switch (protocolType) {
@@ -132,6 +142,7 @@ public final class ProtoSpigot {
                 packetId = ReadUtil.readVarInt(stream);
                 break;
             default:
+                // Code that never can't be reached, but java compiler says something else...
                 throw new IllegalArgumentException("Unknown protocol type");
         }
 

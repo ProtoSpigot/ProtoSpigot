@@ -25,12 +25,12 @@ public final class Protocol_1_5_2 extends Protocol {
     public Protocol_1_5_2() {
         super(61, ProtocolType.LEGACY);
 
-        registerClientPacket(0, Packet0KeepAlive.class, new KeepAlivePacketWriter());
-        registerClientPacket(1, Packet1Login.class, new LoginPacketWriter());
-        registerClientPacket(3, Packet3Chat.class, new ChatPacketWriter());
-        registerClientPacket(4, Packet4UpdateTime.class, new UpdateTimePacketWriter());
-        registerClientPacket(5, Packet5EntityEquipment.class, new EntityEquipmentPacketWriter());
-        registerClientPacket(255, Packet255KickDisconnect.class, new KickPacketWriter());
+        registerServerPacket(0, Packet0KeepAlive.class, new KeepAlivePacketWriter());
+        registerServerPacket(1, Packet1Login.class, new LoginPacketWriter());
+        registerServerPacket(3, Packet3Chat.class, new ChatPacketWriter());
+        registerServerPacket(4, Packet4UpdateTime.class, new UpdateTimePacketWriter());
+        registerServerPacket(5, Packet5EntityEquipment.class, new EntityEquipmentPacketWriter());
+        registerServerPacket(255, Packet255KickDisconnect.class, new KickPacketWriter());
     }
 
     /**

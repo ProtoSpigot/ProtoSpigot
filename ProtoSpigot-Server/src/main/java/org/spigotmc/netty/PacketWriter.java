@@ -1,7 +1,6 @@
 package org.spigotmc.netty;
 
-import com.github.protospigot.ProtoSpigot;
-import com.github.protospigot.protocol.Protocol;
+import com.github.protospigot.ProtoSpigot; // ProtoSpigot
 import io.netty.buffer.ByteBuf;
 import io.netty.buffer.ByteBufOutputStream;
 import io.netty.channel.Channel;
