@@ -111,9 +111,6 @@ public final class ProtoSpigot {
                 // Code that never can't be reached, but java compiler says something else...
                 throw new IllegalArgumentException("Unknown protocol type");
         }
-
-        // Packet body
-        writer.write(packet, stream);
     }
 
     /**
